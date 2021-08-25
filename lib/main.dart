@@ -3,10 +3,15 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app/screens/auth_screen.dart';
+import 'package:flutter_chat_app/screens/chat_list_screen.dart';
+import 'package:flutter_chat_app/widgets/bottom_nav_bar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // final FirebaseApp app = await Firebase.initializeApp();
   await Firebase.initializeApp();
+  // runApp(MyApp(app));
   runApp(MyApp());
 }
 
@@ -27,7 +32,19 @@ class MyApp extends StatelessWidget {
           buttonColor: Colors.lightBlue.shade200,
         )
       ),
-      home: SplashScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctx, snapshot) {
+          if (snapshot.hasData) {
+            return CustomBottomNavBar();
+          } 
+          return AuthScreen();
+        }
+      ),
+      routes: {
+        AuthScreen.routeName: (context) => AuthScreen(),
+        ChatListScreen.routeName: (context) => ChatListScreen()
+      },
     );
   }
 }
